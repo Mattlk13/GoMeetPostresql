@@ -4,6 +4,8 @@ import (
 	/* import standard sql package to  connect to db */
 	"database/sql"
 	"fmt"
+	/* use reflect to find type of vars */
+	"reflect"
 	/* use lib/pq as a postgres driver */
 	_ "github.com/lib/pq"
 )
@@ -17,14 +19,14 @@ const (
 	dbname   = "postgres"
 )
 
-func main() {
+func connect_to_db() *sql.DB {
 	/* connection string */
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	connection_string := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
 	/* validate connection to pg */
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", connection_string)
 
 	if err != nil {
 		panic(err)
@@ -38,5 +40,11 @@ func main() {
 	}
 
 	fmt.Println("Successfully connected!")
+
+	return db
+}
+
+func main() {
+	database := connect_to_db()
 
 }
