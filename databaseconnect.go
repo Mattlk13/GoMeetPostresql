@@ -35,13 +35,13 @@ func query_database(db *sql.DB, query_string string) *sql.Rows {
 	}
 	defer returned_output.Close()
 
+	fmt.Println("Successfully retrieved data!")
+
 	/* Output result */
 	return returned_output
 }
 
-func create_timecard(db *sql.DB, id int, username string) {
-	insert_statement := fmt.Sprintf("INSERT INTO timecards (ID, USERNAME, OCCURRENCE) VALUES(%d, '%s', current_timestamp)", id, username)
-
+func insert_to_database(db *sql.DB, insert_statement string) {
 	/* open a connection to the database */
 	err := db.Ping()
 	if err != nil {
@@ -86,14 +86,19 @@ func main() {
 	}
 	defer db.Close()
 
+	fmt.Println("Successfully connected to database!")
 
-	/* connect to database and load into var */
+	/* Database Operations */
 	list_of_timecards := query_database(db, query_all)
 	first_timecard := query_database(db, query_one)
 
 	fmt.Println(list_of_timecards)
 	fmt.Println(first_timecard)
 
-	create_timecard(db, 9, "DOUG")
+	/* Insert into database */
+	insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
+		"VALUES(14, 'ROHAN', current_timestamp)"
+
+	insert_to_database(db, insert_statement)
 
 }
