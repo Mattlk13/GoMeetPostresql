@@ -74,10 +74,6 @@ func main() {
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	/* Query Strings */
-	query_all := "SELECT * FROM timecards"
-	query_one := "SELECT * FROM timecards WHERE(Id = 1)"
-
 	/* validate connection to pg */
 	db, err := sql.Open("postgres", connection_string)
 
@@ -88,16 +84,20 @@ func main() {
 
 	fmt.Println("Successfully connected to database!")
 
+	/* Query Strings */
+	query_all := "SELECT * FROM timecards"
+	query_one := "SELECT * FROM timecards WHERE(Id = 1)"
+
+	/* Insert Strings */
+	insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
+		"VALUES(15, 'ROHAN', current_timestamp)"
+
 	/* Database Operations */
 	list_of_timecards := query_database(db, query_all)
 	first_timecard := query_database(db, query_one)
 
 	fmt.Println(list_of_timecards)
 	fmt.Println(first_timecard)
-
-	/* Insert into database */
-	insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
-		"VALUES(14, 'ROHAN', current_timestamp)"
 
 	insert_to_database(db, insert_statement)
 
