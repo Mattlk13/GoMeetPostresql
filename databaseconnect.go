@@ -19,7 +19,7 @@ const (
 	dbname   = "postgres"
 )
 
-func connect_to_db() *sql.DB {
+func query_database(query_string string) *sql.Rows {
 	/* connection string */
 	connection_string := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -41,10 +41,21 @@ func connect_to_db() *sql.DB {
 
 	fmt.Println("Successfully connected!")
 
-	return db
+	returned_output, err := db.Query(query_string)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(reflect.TypeOf(returned_output))
+
+	return returned_output
 }
 
 func main() {
-	database := connect_to_db()
+	query := "SELECT * FROM timecards"
+	/* connect to database and load into var */
+	list_of_timecards := query_database(query)
+
+	fmt.Println(list_of_timecards)
 
 }
