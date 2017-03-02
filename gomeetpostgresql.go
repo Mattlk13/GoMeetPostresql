@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 	/* use reflect to find type of vars */
 	//"reflect"
 	/* use lib/pq as a postgres driver */
@@ -146,14 +147,23 @@ func main() {
 		fmt.Print(prompt)
 		input_reader.Scan()
 		input_string = input_reader.Text()
+		sql_operation := strings.Split(input_string, " ")[0]
 		if input_string == "-h" {
 			fmt.Println("Thanks for checking out this little toy. Here's what go-meets-postgres supports: ")
 			fmt.Println("	SELECT		Select rows from tables")
+			fmt.Println("	INSERT		Insert row into table")
 			fmt.Println("	QUIT		Type -q to quit")
 		}
 		if (input_string != "-q") && (input_string != "-h") {
-			query_return := query_database(db, input_string)
-			fmt.Println(query_return)
+			switch sql_operation {
+			case "select":
+				query_return := query_database(db, input_string)
+				fmt.Println(query_return)
+			case "insert":
+				insert_to_database(db, input_string)
+			default:
+				fmt.Println("Operation not supported. Type -h for help")
+			}
 
 		}
 	}
