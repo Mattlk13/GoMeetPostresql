@@ -2,8 +2,10 @@ package main
 
 import (
 	/* import standard sql package to  connect to db */
+	"bufio"
 	"database/sql"
 	"fmt"
+	"os"
 	/* use reflect to find type of vars */
 	//"reflect"
 	/* use lib/pq as a postgres driver */
@@ -60,13 +62,15 @@ func query_database(db *sql.DB, query_string string) []interface{} {
 			value_pointers[i] = &values[i]
 		}
 
-		/* Use scan to convert returned_rows elements to pointed types */
+		/* Use scan to convert returned_rows elements to pointed types, and store */
 		returned_rows.Scan(value_pointers...)
 
 		/* Assign value to key in row map */
 		for i, column := range column_names {
 			row_map[column] = values[i]
 		}
+
+		/* Add formatted row_map to output array */
 		query_output = append(query_output, row_map)
 	}
 
@@ -119,16 +123,34 @@ func main() {
 
 	fmt.Println("Successfully connected to database!")
 
-	/* Database Operations */
-	all_timecard := query_database(db, "SELECT * FROM timecards")
+	/* Database Operations
+	all_timecard := query_database(db, "SELECT * FROM timecards") */
 
-	/* Get one row from database return */
+	/* Get one row from database return
 	entry := all_timecard[0].(map[string]interface{})
-	fmt.Println(entry)
+	fmt.Println(entry) */
 
-	/* Insert Strings  */
-	//insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
-	//	"VALUES(15, 'ROHAN', current_timestamp)"
-	//insert_to_database(db, insert_statement)
+	/* Insert Strings
+	insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
+		"VALUES(15, 'ROHAN', current_timestamp)"
+	insert_to_database(db, insert_statement) */
 
+	/* Prompt user to query database */
+	input_reader := bufio.NewScanner(os.Stdin)
+	var input_string string
+
+	fmt.Println("Enter raw SQL to query database, or '-h' for help")
+	for input_string != "q" {
+		fmt.Print("Go-Meet-PostgreSQL: ")
+		input_reader.Scan()
+		input_string = input_reader.Text()
+		if input_string == "-h" {
+			fmt.Println("Type q to quit")
+		}
+		if (input_string != "q") && (input_string != "-h") {
+			query_return := query_database(db, input_string)
+			fmt.Println(query_return)
+
+		}
+	}
 }
