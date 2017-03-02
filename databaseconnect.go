@@ -138,16 +138,19 @@ func main() {
 	/* Prompt user to query database */
 	input_reader := bufio.NewScanner(os.Stdin)
 	var input_string string
+	prompt := fmt.Sprintf("%s:", dbname)
 
 	fmt.Println("Enter raw SQL to query database, or '-h' for help")
-	for input_string != "q" {
-		fmt.Print("Go-Meet-PostgreSQL: ")
+	for input_string != "-q" {
+		fmt.Print(prompt)
 		input_reader.Scan()
 		input_string = input_reader.Text()
 		if input_string == "-h" {
-			fmt.Println("Type q to quit")
+			fmt.Println("Thanks for checking out this little toy. Here's what go-meets-postgres supports: ")
+			fmt.Println("	SELECT		Select rows from tables")
+			fmt.Println("	QUIT		Type -q to quit")
 		}
-		if (input_string != "q") && (input_string != "-h") {
+		if (input_string != "-q") && (input_string != "-h") {
 			query_return := query_database(db, input_string)
 			fmt.Println(query_return)
 
