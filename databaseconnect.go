@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	/* use reflect to find type of vars */
-	/*"reflect"*/
+	"reflect"
 	/* use lib/pq as a postgres driver */
 	_ "github.com/lib/pq"
 )
@@ -19,7 +19,7 @@ const (
 	dbname   = "postgres"
 )
 
-func query_database(db *sql.DB, query_string string) *sql.Rows {
+func query_database(db *sql.DB, query_string string) []interface{} {
 	/* open a connection to the database */
 	err := db.Ping()
 	if err != nil {
@@ -35,50 +35,47 @@ func query_database(db *sql.DB, query_string string) *sql.Rows {
 	}
 	defer returned_rows.Close()
 
+	/* Get column names and length */
 	column_names, err := returned_rows.Columns()
 	if err != nil {
 		fmt.Println("Error!")
 		panic(err)
 	}
-
 	column_length := len(column_names)
 
-	/* Set up slices for scanning rows*/
-	values := make([]interface{}, column_length)
-	value_pointers := make([]interface{}, column_length)
 
+
+	/* output array */
+	var query_output []interface{}
+
+	/* Iterate over every row returned from query */
 	for returned_rows.Next() {
+		/* Set up empty slices to hold values and pointers to values */
+		values := make([]interface{}, column_length)
+		value_pointers := make([]interface{}, column_length)
+
+		/* Row assembly */
+		row_map := make(map[string]interface{})
+
+		/* Iterate over every column name and set pointers to empty values */
 		for i, _ := range column_names {
 			value_pointers[i] = &values[i]
 		}
 
+		/* Use scan to convert returned_rows elements to pointed types */
 		returned_rows.Scan(value_pointers...)
+
+		/* Assign value to key in row map */
 		for i, column := range column_names {
-			var v interface{}
-			value := values[i]
-			byte_rep, ok := value.([]byte)
-
-			if ok {
-				v = string(byte_rep)
-			} else {
-				v = value
-			}
-
-			fmt.Println(column, v)
+			row_map[column] = values[i]
 		}
-	}
-
-	err = returned_rows.Err()
-
-	if err != nil {
-		fmt.Println("Error!")
-		panic(err)
+		query_output = append(query_output, row_map)
 	}
 
 	fmt.Println("Successfully retrieved data!")
 
 	/* Output result */
-	return returned_rows
+	return query_output
 }
 
 func insert_to_database(db *sql.DB, insert_statement string) {
@@ -124,18 +121,17 @@ func main() {
 
 	fmt.Println("Successfully connected to database!")
 
-	/* Query Strings */
-	query_one := "SELECT * FROM timecards WHERE(Id = 1)"
-
-	/* Insert Strings */
-	insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
-		"VALUES(15, 'ROHAN', current_timestamp)"
-
 	/* Database Operations */
-	first_timecard := query_database(db, query_one)
+	all_timecard := query_database(db, "SELECT * FROM timecards")
+	fmt.Println(reflect.TypeOf(all_timecard[2]))
 
-	fmt.Println(first_timecard)
+	/* Get one row from database return */
+	entry := all_timecard[1].(map[string]interface{})
+	fmt.Println(entry["username"])
 
-	insert_to_database(db, insert_statement)
+	/* Insert Strings  */
+	//insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
+	//	"VALUES(15, 'ROHAN', current_timestamp)"
+	//insert_to_database(db, insert_statement) 
 
 }
