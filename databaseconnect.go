@@ -61,9 +61,9 @@ func insert_to_database(db *sql.DB, insert_statement string) {
 	if err != nil {
 		fmt.Println("Error!")
 		panic(err)
-	} else {
-		fmt.Println("Successfully Inserted")
 	}
+
+	fmt.Println("Successfully Inserted")
 
 	defer insert_command.Close()
 }
