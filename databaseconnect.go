@@ -28,17 +28,57 @@ func query_database(db *sql.DB, query_string string) *sql.Rows {
 	}
 
 	/* Query Database */
-	returned_output, err := db.Query(query_string)
+	returned_rows, err := db.Query(query_string)
 	if err != nil {
 		fmt.Println("Error!")
 		panic(err)
 	}
-	defer returned_output.Close()
+	defer returned_rows.Close()
+
+	column_names, err := returned_rows.Columns()
+	if err != nil {
+		fmt.Println("Error!")
+		panic(err)
+	}
+
+	column_length := len(column_names)
+
+	/* Set up slices for scanning rows*/
+	values := make([]interface{}, column_length)
+	value_pointers := make([]interface{}, column_length)
+
+	for returned_rows.Next() {
+		for i, _ := range column_names {
+			value_pointers[i] = &values[i]
+		}
+
+		returned_rows.Scan(value_pointers...)
+		for i, column := range column_names {
+			var v interface{}
+			value := values[i]
+			byte_rep, ok := value.([]byte)
+
+			if ok {
+				v = string(byte_rep)
+			} else {
+				v = value
+			}
+
+			fmt.Println(column, v)
+		}
+	}
+
+	err = returned_rows.Err()
+
+	if err != nil {
+		fmt.Println("Error!")
+		panic(err)
+	}
 
 	fmt.Println("Successfully retrieved data!")
 
 	/* Output result */
-	return returned_output
+	return returned_rows
 }
 
 func insert_to_database(db *sql.DB, insert_statement string) {
@@ -85,7 +125,6 @@ func main() {
 	fmt.Println("Successfully connected to database!")
 
 	/* Query Strings */
-	query_all := "SELECT * FROM timecards"
 	query_one := "SELECT * FROM timecards WHERE(Id = 1)"
 
 	/* Insert Strings */
@@ -93,10 +132,8 @@ func main() {
 		"VALUES(15, 'ROHAN', current_timestamp)"
 
 	/* Database Operations */
-	list_of_timecards := query_database(db, query_all)
 	first_timecard := query_database(db, query_one)
 
-	fmt.Println(list_of_timecards)
 	fmt.Println(first_timecard)
 
 	insert_to_database(db, insert_statement)
