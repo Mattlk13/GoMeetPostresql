@@ -121,7 +121,8 @@ func main() {
 	}
 	defer db.Close()
 
-	fmt.Println("Successfully connected to database!")
+	db_connect_success_message := fmt.Sprintf("Successfully connected to %s database!", dbname)
+	fmt.Println(db_connect_success_message)
 
 	/* Database Operations
 	all_timecard := query_database(db, "SELECT * FROM timecards") */
