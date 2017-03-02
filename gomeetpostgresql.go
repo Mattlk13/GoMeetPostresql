@@ -111,6 +111,13 @@ func insert_to_database(db *sql.DB, insert_statement string) {
 	defer insert_command.Close()
 }
 
+func show_help() {
+	fmt.Println("Thanks for checking out this little toy. Here's what go-meets-postgres supports: ")
+	fmt.Println("	SELECT		Select rows from tables")
+	fmt.Println("	INSERT		Insert row into table")
+	fmt.Println("	QUIT		Type -q to quit")
+}
+
 func main() {
 	/* connection string */
 	connection_string := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -122,6 +129,7 @@ func main() {
 
 	if err != nil {
 		fmt.Println("Error: ", err)
+		panic(err)
 	}
 	defer db.Close()
 
@@ -137,8 +145,7 @@ func main() {
 
 	/* Insert Strings
 	insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
-		"VALUES(15, 'ROHAN', current_timestamp)"
-	insert_to_database(db, insert_statement) */
+		"VALUES(15, 'ROHAN', current_timestamp)" */
 
 	/* Prompt user to query database */
 	input_reader := bufio.NewScanner(os.Stdin)
@@ -153,12 +160,8 @@ func main() {
 		sql_operation := strings.Split(input_string, " ")[0]
 		sql_operation = strings.ToLower(sql_operation)
 		if input_string == "-h" {
-			fmt.Println("Thanks for checking out this little toy. Here's what go-meets-postgres supports: ")
-			fmt.Println("	SELECT		Select rows from tables")
-			fmt.Println("	INSERT		Insert row into table")
-			fmt.Println("	QUIT		Type -q to quit")
-		}
-		if (input_string != "-q") && (input_string != "-h") {
+			show_help()
+		} else if input_string != "-q" {
 			switch sql_operation {
 			case "select":
 				query_return := query_database(db, input_string)
@@ -169,6 +172,9 @@ func main() {
 				fmt.Println("Operation not supported. Type -h for help")
 			}
 
+		} else {
+			db.Close()
+			fmt.Println("Closed database connection, goodbye :)")
 		}
 	}
 }
