@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	/* use reflect to find type of vars */
-	"reflect"
+	//"reflect"
 	/* use lib/pq as a postgres driver */
 	_ "github.com/lib/pq"
 )
@@ -123,11 +123,10 @@ func main() {
 
 	/* Database Operations */
 	all_timecard := query_database(db, "SELECT * FROM timecards")
-	fmt.Println(reflect.TypeOf(all_timecard[2]))
 
 	/* Get one row from database return */
-	entry := all_timecard[1].(map[string]interface{})
-	fmt.Println(entry["username"])
+	entry := all_timecard[0].(map[string]interface{})
+	fmt.Println(entry)
 
 	/* Insert Strings  */
 	//insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
