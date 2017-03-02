@@ -1,5 +1,5 @@
 # GoMeetPostresql
-Heres a small template for interacting with a Postgresql database written in Go. Will be a library very soon...
+Heres a small wrapper for interacting with a Postgresql database written in Go.
 
 `go run gomeetpostgresql.go`
 
