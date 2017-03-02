@@ -113,8 +113,8 @@ func insert_to_database(db *sql.DB, insert_statement string) {
 
 func show_help() {
 	fmt.Println("Thanks for checking out this little toy. Here's what go-meets-postgres supports: ")
-	fmt.Println("	SELECT		Select rows from tables")
-	fmt.Println("	INSERT		Insert row into table")
+	fmt.Println("	SELECT		Select rows from tables 'SELECT * FROM users'")
+	fmt.Println("	INSERT		Insert row into table 'INSERT INTO users (ID, NAME) VALUES(1, 'Rohan')'")
 	fmt.Println("	QUIT		Type -q to quit")
 }
 
