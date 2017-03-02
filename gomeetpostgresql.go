@@ -1,19 +1,22 @@
 package main
 
 import (
-	/* import standard sql package to  connect to db */
+	/* import buffered i/o for interface */
 	"bufio"
+	/* import standard sql package to  connect to db */
 	"database/sql"
+	/* import fmt and reflect for debugging */
 	"fmt"
-	"os"
-	"strings"
-	/* use reflect to find type of vars */
 	//"reflect"
+	/* import os for user input */
+	"os"
+	/* import strings for string manipulation */
+	"strings"
 	/* use lib/pq as a postgres driver */
 	_ "github.com/lib/pq"
 )
 
-/* database connection vars */
+/* EDIT THESE FOR YOUR OWN DATABASE -- Database connection vars */
 const (
 	host     = "localhost"
 	port     = 5432
