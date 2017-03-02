@@ -43,8 +43,6 @@ func query_database(db *sql.DB, query_string string) []interface{} {
 	}
 	column_length := len(column_names)
 
-
-
 	/* output array */
 	var query_output []interface{}
 
@@ -131,6 +129,6 @@ func main() {
 	/* Insert Strings  */
 	//insert_statement := "INSERT INTO timecards (ID, USERNAME, OCCURRENCE) " +
 	//	"VALUES(15, 'ROHAN', current_timestamp)"
-	//insert_to_database(db, insert_statement) 
+	//insert_to_database(db, insert_statement)
 
 }
