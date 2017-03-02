@@ -148,6 +148,7 @@ func main() {
 		input_reader.Scan()
 		input_string = input_reader.Text()
 		sql_operation := strings.Split(input_string, " ")[0]
+		sql_operation = strings.ToLower(sql_operation)
 		if input_string == "-h" {
 			fmt.Println("Thanks for checking out this little toy. Here's what go-meets-postgres supports: ")
 			fmt.Println("	SELECT		Select rows from tables")
