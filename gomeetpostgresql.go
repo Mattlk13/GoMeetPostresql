@@ -41,6 +41,40 @@ func query_database(db *sql.DB, query_string string) []interface{} {
 	}
 	defer returned_rows.Close()
 
+	return output_rows(returned_rows)
+}
+
+func insert_to_database(db *sql.DB, insert_statement string) {
+	/* open a connection to the database */
+	err := db.Ping()
+	if err != nil {
+		fmt.Println("Error!")
+		panic(err)
+	}
+
+	/* Prepare Insertion Database */
+	insert_command, err := db.Prepare(insert_statement)
+	if err != nil {
+		fmt.Println("Error!")
+		panic(err)
+	}
+
+	/* Execute Insert Statement */
+	new_rows, err := insert_command.Exec()
+	if err != nil {
+		fmt.Println("Error!")
+		panic(err)
+	}
+	defer insert_command.Close()
+
+	/* Output success message of rows changed */
+	number_of_rows_changed, _ := new_rows.RowsAffected()
+	db_insert_success_message := fmt.Sprintf("Successfully inserted %d row", number_of_rows_changed)
+	fmt.Println(db_insert_success_message)
+
+}
+
+func output_rows(returned_rows *sql.Rows) []interface{} {
 	/* Get column names and length */
 	column_names, err := returned_rows.Columns()
 	if err != nil {
@@ -78,44 +112,27 @@ func query_database(db *sql.DB, query_string string) []interface{} {
 		query_output = append(query_output, row_map)
 	}
 
-	fmt.Println("Successfully retrieved data!")
-
 	/* Output result */
+	db_select_success_message := fmt.Sprintf("\nSuccessfully returned %d rows\n", len(query_output))
+	fmt.Println(db_select_success_message)
+
 	return query_output
 }
 
-func insert_to_database(db *sql.DB, insert_statement string) {
-	/* open a connection to the database */
-	err := db.Ping()
-	if err != nil {
-		fmt.Println("Error!")
-		panic(err)
+func display_table(db *sql.DB, table_name string){
+	select_all_query := fmt.Sprintf("SELECT * FROM %s", table_name)
+	raw_rows := query_database(db, select_all_query)
+	for _, row := range raw_rows {
+		fmt.Println(row)
 	}
-
-	/* Prepare Insertion Database */
-	insert_command, err := db.Prepare(insert_statement)
-	if err != nil {
-		fmt.Println("Error!")
-		panic(err)
-	}
-
-	/* Execute Insert Statement */
-	_, err = insert_command.Exec()
-	if err != nil {
-		fmt.Println("Error!")
-		panic(err)
-	}
-
-	fmt.Println("Successfully Inserted")
-
-	defer insert_command.Close()
 }
 
 func show_help() {
-	fmt.Println("Thanks for checking out this little toy. Here's what the wrapper supports: ")
-	fmt.Println("	SELECT		Select rows from tables 'SELECT * FROM users'")
-	fmt.Println("	INSERT		Insert row into table 'INSERT INTO users (ID, NAME) VALUES(1, 'Rohan')'")
-	fmt.Println("	QUIT		Type -q to quit")
+	fmt.Println("\n	Thanks for checking out this little toy. Here's what the wrapper supports:\n")
+	fmt.Println("	- SELECT	Select rows from tables 'SELECT * FROM users'")
+	fmt.Println("	- INSERT	Insert row into table 'INSERT INTO users (ID, NAME) VALUES(1, 'Rohan')'")
+	fmt.Println("	- SHOW		Display an entire table 'SHOW users'")
+	fmt.Println("	- QUIT		Type -q to quit\n")
 }
 
 func main() {
@@ -157,17 +174,25 @@ func main() {
 		fmt.Print(prompt)
 		input_reader.Scan()
 		input_string = input_reader.Text()
-		sql_operation := strings.Split(input_string, " ")[0]
+		input_string_split := strings.Split(input_string, " ")
+		sql_operation := input_string_split[0]
 		sql_operation = strings.ToLower(sql_operation)
 		if input_string == "-h" {
 			show_help()
 		} else if input_string != "-q" {
 			switch sql_operation {
 			case "select":
-				query_return := query_database(db, input_string)
-				fmt.Println(query_return)
+				select_output := query_database(db, input_string)
+				fmt.Println(select_output)
 			case "insert":
 				insert_to_database(db, input_string)
+			case "show":
+				if (len(input_string_split) == 2){
+					table_name := input_string_split[1]
+					display_table(db, table_name)
+				}else {
+					fmt.Println("Invalid number of arguments. Try 'Show table_name'")
+				}
 			default:
 				fmt.Println("Operation not supported. Type -h for help")
 			}
