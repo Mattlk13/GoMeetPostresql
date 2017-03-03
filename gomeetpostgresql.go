@@ -119,7 +119,7 @@ func output_rows(returned_rows *sql.Rows) []interface{} {
 	return query_output
 }
 
-func display_table(db *sql.DB, table_name string){
+func display_table(db *sql.DB, table_name string) {
 	select_all_query := fmt.Sprintf("SELECT * FROM %s", table_name)
 	raw_rows := query_database(db, select_all_query)
 	for _, row := range raw_rows {
@@ -127,12 +127,30 @@ func display_table(db *sql.DB, table_name string){
 	}
 }
 
+func database_info(db *sql.DB) {
+	/* open a connection to the database */
+	err := db.Ping()
+	if err != nil {
+		fmt.Println("Error!")
+		panic(err)
+	}
+
+	/* get database info */
+	database_connections := db.Stats().OpenConnections
+	if database_connections == 1 {
+		database_info := fmt.Sprintf("Currently connected to database [%s], on port [%d], as [%s] \n",
+			dbname, port, user)
+		fmt.Printf(database_info)
+	}
+}
+
 func show_help() {
 	fmt.Println("\n	Thanks for checking out this little toy. Here's what the wrapper supports:\n")
-	fmt.Println("	- SELECT	Select rows from tables 'SELECT * FROM users WHERE(id = 1)'")
-	fmt.Println("	- INSERT	Insert row into table 'INSERT INTO users (ID, NAME) VALUES(1, 'Rohan')'")
-	fmt.Println("	- SHOW		Display an entire table 'SHOW users'")
-	fmt.Println("	- QUIT		Type -q to quit\n")
+	fmt.Println("	SELECT		Select rows from tables 'SELECT * FROM users WHERE(id = 1)'")
+	fmt.Println("	INSERT		Insert row into table 'INSERT INTO users (ID, NAME) VALUES(1, 'Rohan')'")
+	fmt.Println("	SHOW		Display an entire table 'SHOW users'")
+	fmt.Println("\n	-i		Show current database connection info")
+	fmt.Println("	-q		Close database connection and quit\n")
 }
 
 func main() {
@@ -177,9 +195,7 @@ func main() {
 		input_string_split := strings.Split(input_string, " ")
 		sql_operation := input_string_split[0]
 		sql_operation = strings.ToLower(sql_operation)
-		if input_string == "-h" {
-			show_help()
-		} else if input_string != "-q" {
+		if input_string != "-q" {
 			switch sql_operation {
 			case "select":
 				select_output := query_database(db, input_string)
@@ -187,12 +203,16 @@ func main() {
 			case "insert":
 				insert_to_database(db, input_string)
 			case "show":
-				if (len(input_string_split) == 2){
+				if len(input_string_split) == 2 {
 					table_name := input_string_split[1]
 					display_table(db, table_name)
-				}else {
+				} else {
 					fmt.Println("Invalid number of arguments. Try 'Show table_name'")
 				}
+			case "-i":
+				database_info(db)
+			case "-h":
+				show_help()
 			default:
 				fmt.Println("Operation not supported. Type -h for help")
 			}
