@@ -129,7 +129,7 @@ func display_table(db *sql.DB, table_name string){
 
 func show_help() {
 	fmt.Println("\n	Thanks for checking out this little toy. Here's what the wrapper supports:\n")
-	fmt.Println("	- SELECT	Select rows from tables 'SELECT * FROM users'")
+	fmt.Println("	- SELECT	Select rows from tables 'SELECT * FROM users WHERE(id = 1)'")
 	fmt.Println("	- INSERT	Insert row into table 'INSERT INTO users (ID, NAME) VALUES(1, 'Rohan')'")
 	fmt.Println("	- SHOW		Display an entire table 'SHOW users'")
 	fmt.Println("	- QUIT		Type -q to quit\n")
