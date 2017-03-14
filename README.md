@@ -1,9 +1,13 @@
 # Go Meet PostgreSQL
-Heres a small wrapper for interacting with a Postgresql database written in Go.
+This is a small wrapper for interacting with a Postgresql database in Go.
+
+You can use it to SELECT and INSERT rows, and SHOW entire tables.
+
+A simple command line interface has been implemented, however this is not essential for the wrappers use. 
 
 `go run gomeetpostgresql.go`
 
 Type `-h` for help
 
 
-![screenshot](http://i.imgur.com/SbqbBh0.png)
+![screenshot](http://i.imgur.com/rD3uVt6.png)
