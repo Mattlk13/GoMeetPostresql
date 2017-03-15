@@ -105,7 +105,7 @@ func output_rows(returned_rows *sql.Rows) []interface{} {
 
 		/* Assign value to key in row map */
 		for i, column := range column_names {
-			row_map[column] = values[i]
+			row_map[column] = fmt.Sprintf("%v",values[i])
 		}
 
 		/* Add formatted row_map to output array */
@@ -167,6 +167,12 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		fmt.Println("Error: ", err)
+		panic(err)
+	}
 
 	db_connect_success_message := fmt.Sprintf("Successfully connected to %s database!", dbname)
 	fmt.Println(db_connect_success_message)
