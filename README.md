@@ -1,6 +1,6 @@
 # Go Meet DB - A wrapper for interacting with databases in pure Go
 
-![screenshot](http://i.imgur.com/rD3uVt6.png)
+![screenshot](http://i.imgur.com/VxDboZW.png)
 
 This is a small wrapper for interacting with a database in Go, it is a great way to quickly get your project connected to a database and output queries in a human-readable format. 
 
@@ -8,7 +8,7 @@ A simple command line interface has been implemented, however this is not essent
 
 As an example, the `lib/pq` driver has been used to connect to a PostgreSQL database. However, you can swap out the driver and connect this wrapper to another database, such as MSSQL.
 
-`go run gomeetpostgresql.go`
+`go run gomeetdb.go`
 
 Type `-h` for help
 
